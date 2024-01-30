@@ -58,12 +58,15 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          # docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 263293423627.dkr.ecr.us-east-1.amazonaws.com
+          docker build -t studentperformance .
+          docker tag studentperformance:latest 263293423627.dkr.ecr.us-east-1.amazonaws.com/studentperformance:latest
+          docker push 263293423627.dkr.ecr.us-east-1.amazonaws.com/studentperformance:latest
           
-          
-          
+
   Continuous-Deployment:
     needs: build-and-push-ecr-image
     runs-on: self-hosted
