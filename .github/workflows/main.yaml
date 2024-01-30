@@ -7,8 +7,6 @@ on:
     paths-ignore:
       - 'README.md'
 
-
-
 permissions:
   id-token: write
   contents: read
@@ -16,7 +14,7 @@ permissions:
 jobs:
   integration:
     name: Continuous Integration
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -30,7 +28,7 @@ jobs:
   build-and-push-ecr-image:
     name: Continuous Delivery
     needs: integration
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -61,9 +59,9 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          echo "docker built successfully $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          
           
           
   Continuous-Deployment:
