@@ -61,10 +61,10 @@ jobs:
           # docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           # echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 263293423627.dkr.ecr.us-east-1.amazonaws.com
-          docker build -t studentperformance .
-          docker tag studentperformance:latest 263293423627.dkr.ecr.us-east-1.amazonaws.com/studentperformance:latest
-          docker push 263293423627.dkr.ecr.us-east-1.amazonaws.com/studentperformance:latest
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ECR_LOGIN_URI
+          docker build -t $ECR_REPOSITORY .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $AWS_ECR_LOGIN_URI/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $AWS_ECR_LOGIN_URI/$ECR_REPOSITORY:$IMAGE_TAG
           
 
   Continuous-Deployment:
@@ -96,7 +96,7 @@ jobs:
        
       - name: Run Docker Image to serve users
         run: |
-         docker run -d -p 8080:8080 --ipc="host" --name=mltest -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  263293423627.dkr.ecr.us-east-1.amazonaws.com/studentperformance:latest#${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+         docker run -d -p 8080:8080 --ipc="host" --name=mltest -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
       - name: Clean previous images and containers
         run: |
          docker system prune -f
